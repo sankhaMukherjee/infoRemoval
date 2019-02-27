@@ -1,6 +1,8 @@
 from logs import logDecorator as lD 
 import json, pprint
 
+from lib.dicomIO import dicomIO
+
 config = json.load(open('../config/config.json'))
 logBase = config['logging']['logBase'] + '.modules.module1.module1'
 
@@ -17,7 +19,32 @@ def doSomething(logger):
         The logger used for logging error information
     '''
 
-    print('We are in module 1')
+    try:
+        print('---------[Original Data]-----------------------')
+        metaData = dicomIO.readFileMetaData('../data/raw_data/c002_250417/DICOM/00000001/00000002/00000016')
+        pprint.pprint(metaData)
+
+        print('---------[Redacting ]-----------------------')
+        folderName     = '../data/raw_data/c002_250417/DICOM/00000001/00000002'
+        fileName       = '00000016'
+        outFolderName  = '../data/raw_data/intermediate'
+        redactList     = [
+            'InstitutionAddress', 
+            'InstitutionName', 
+            'PatientAddress', 
+            'PatientAge',
+            'PatientBirthDate',
+            'PatientSex']
+        dicomIO.saveAfterRedaction(folderName, fileName, outFolderName, redactList)
+
+        print('---------[New Data]-----------------------')
+        metaData = dicomIO.readFileMetaData('../data/raw_data/intermediate/00000016')
+        pprint.pprint(metaData)
+
+
+
+    except Exception as e:
+        logger.error(f'Unable to perform the required tasks: {e}')
 
     return
 
@@ -43,8 +70,7 @@ def main(logger, resultsDict):
     print('Main function of module 1')
     print('='*30)
     print('We get a copy of the result dictionary over here ...')
-    pprint.pprint(resultsDict)
-
+    
     doSomething()
 
     print('Getting out of Module 1')
