@@ -1,16 +1,12 @@
 
 <form method="post">
-
 <table>
 
     {% for item in items %}
     <tr>
-        <td>
-            {{ item.item }}
-        </td>
-        <td>
-            <input type="checkbox" name="checkedItems" value="{{ item.item }}" {{ item.checked }}>
-        </td>
+        <td>{{ item.item }}</td>
+        <td><input type="checkbox" name="checkedItems" value="{{ item.item }}" {{ item.checked }}></td>
+        <td>{{ item.text }}</td>
     </tr>
     {% endfor %}
 

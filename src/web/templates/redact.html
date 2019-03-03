@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>redaction</title>
+</head>
+<body>
+
+    <h1>Redcation</h1>
+
+    <form><input type="submit" name="submit"></form>
+
+    <div>
+        <h2>Folder for redaction</h2><br>
+        {{ folder }}
+    </div>
+
+    <div>
+        <h2>Items for redaction</h2><br>
+        <ul>
+            {% for item in items %}
+            <li> {{ item }} </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+        <h2>Items NOT for redaction</h2><br>
+        <ul>
+            {% for item in others %}
+            <li> {{ item }} </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>
