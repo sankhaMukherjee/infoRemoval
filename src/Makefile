@@ -7,6 +7,10 @@ run:
 runA:
 	../bin/run.sh -a
 
+gui:
+	../bin/web.sh
+
+
 # This is a quick check for timming.
 # For thorough results, use the profile
 # option
