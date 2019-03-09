@@ -17,6 +17,9 @@ class MyGUI:
 
         self.root = tk.Tk()
 
+        self.redactionList = []
+        self.allowSelection = False
+
         # Input for the folder
         #----------------------------
         self.folderName = tk.StringVar()
@@ -45,6 +48,10 @@ class MyGUI:
         self.miscButtonsFrame.pack( side=tk.TOP, fill=tk.X )
         self.loadButton = tk.Button(self.miscButtonsFrame, text = 'load DICOM File', command=self.loadDicomFeatures)
         self.loadButton.pack( side = tk.LEFT)
+        self.getSelectionButton = tk.Button(self.miscButtonsFrame, text = 'get Redaction List', command=self.__getSelected__)
+        self.getSelectionButton.pack( side = tk.LEFT)
+
+        self.__activateLoad__()
 
         # This is the status message frame
         #----------------------------------
@@ -134,25 +141,70 @@ class MyGUI:
             print(metaData)
             if metaData == {}:
                 self.statusLabel['text'] = 'STATUS: [ERROR] - Probably not a good DICOM file ...'
+                self.allowSelection = False
+                self.__activateLoad__()
                 return
 
-            self.metaData = metaData
-            
             self.statusLabel['text'] = f'STATUS: [OK] - DICOM file {fileName} loaded'
 
-            # Destroy the info section ...
+            # Update the metadata and allow selection
+            self.metaData = metaData
             self.__updateMetaData__( metaData )
+            
+            self.allowSelection = True
+            self.__activateLoad__()
             
 
         except Exception as e:
             logger.error(f'Unable to load the DICOM file: {e}')
             self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to load the dicom file: {e}'
 
-    def __updateMetaData__(self, metaData):
+    @lD.log( logBase + '.__updateMetaData__' )
+    def __updateMetaData__(logger, self, metaData):
 
-        self.metaList.delete(0, tk.END)
-        for k, v in metaData.items():
-            t = f'[{k[:30].rjust(30)}] -> [{v[:30].ljust(30)}]'
-            self.metaList.insert(tk.END, t)
+        try:
+            self.metaList.delete(0, tk.END)
+            for k, v in metaData.items():
+                t = f'[{k.rjust(30)}] -> [{v[:30].ljust(30)}]'
+                self.metaList.insert(tk.END, t)
+        except Exception as e:
+            self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to update metadata: {e}'
+            logger.error(f'Unable to update the maetData: {e}')
+
         return
+
+    @lD.log( logBase + '.__getSelected__' )
+    def __getSelected__(logger, self):
+
+        try:
+            selected = [self.metaList.get(idx) for idx in self.metaList.curselection()]
+            selected = [s[1:].split(']')[0].strip()  for s in selected]
+            print(selected)
+        except Exception as e:
+            self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to get fields: {e}'
+            logger.error(f'Unable to obtain selected fields: {e}')
+
+        return
+
+    @lD.log( logBase + '.__activateLoad__' )
+    def __activateLoad__(logger, self):
+        '''[summary]
+        
+        [description]
+        
+        Parameters
+        ----------
+        logger : {[type]}
+            [description]
+        self : {[type]}
+            [description]
+        '''
+
+        if self.allowSelection:
+            self.getSelectionButton['state'] = tk.NORMAL
+        else:
+            self.getSelectionButton['state'] = tk.DISABLED
+
+        return
+
 
