@@ -36,6 +36,8 @@ class MyGUI:
         self.fileInput  = tk.Entry(self.fileFrame, textvariable=self.fileName, width=50); self.fileInput.pack( side = tk.LEFT )
         self.fileButton = tk.Button(self.fileFrame, text='...', command=self.getFile);    self.fileButton.pack( side = tk.LEFT )
 
+        # This is the quit frame 
+        #----------------------------
         self.quitFrame = tk.Frame(self.root)
         self.quitFrame.pack( side=tk.TOP, expand=True, fill=tk.X )
         self.quitButton = tk.Button(self.quitFrame, text = 'Quit', command=self.root.quit)
