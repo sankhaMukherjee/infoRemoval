@@ -164,9 +164,15 @@ class MyGUI:
 
         try:
             self.metaList.delete(0, tk.END)
-            for k, v in metaData.items():
-                t = f'[{k.rjust(30)}] -> [{v[:30].ljust(30)}]'
-                self.metaList.insert(tk.END, t)
+
+            if type(metaData) == dict:
+                for k, v in metaData.items():
+                    t = f'[{k.rjust(30)}] -> [{v[:30].ljust(30)}]'
+                    self.metaList.insert(tk.END, t)
+            elif type(metaData) == list:
+                for l in metaData:
+                    l = str(l)
+                    self.metaList.insert(tk.END, l)
         except Exception as e:
             self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to update metadata: {e}'
             logger.error(f'Unable to update the maetData: {e}')
@@ -179,7 +185,11 @@ class MyGUI:
         try:
             selected = [self.metaList.get(idx) for idx in self.metaList.curselection()]
             selected = [s[1:].split(']')[0].strip()  for s in selected]
-            print(selected)
+            self.redactionList = selected
+            self.__updateMetaData__(selected)
+            self.allowSelection = False 
+            self.__activateLoad__()
+            
         except Exception as e:
             self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to get fields: {e}'
             logger.error(f'Unable to obtain selected fields: {e}')
@@ -206,5 +216,3 @@ class MyGUI:
             self.getSelectionButton['state'] = tk.DISABLED
 
         return
-
-
