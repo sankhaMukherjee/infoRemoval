@@ -10,6 +10,9 @@ runA:
 gui:
 	../bin/web.sh
 
+tkinter:
+	python3 tkGUI.py
+
 
 # This is a quick check for timming.
 # For thorough results, use the profile
