@@ -79,7 +79,51 @@ def readFileMetaData(logger, fileName):
     except Exception as e:
         logger.error(f'Unable to read metadata from the file {fileName}: {e}')
 
+    return result
 
+@lD.log(logBase + '.readAllFileMetaData')
+def readAllFileMetaData(logger, fileName):
+    '''[summary]
+    
+    [description]
+    
+    Parameters
+    ----------
+    logger : {[type]}
+        [description]
+    fileName : {[type]}
+        [description]
+    
+    Returns
+    -------
+    [type]
+        [description]
+    '''
+
+    try:
+
+        result = {}
+
+        ds = pd.dcmread(fileName)
+        
+        for k in ds.dir():
+
+            de = ds.data_element(k)
+
+            # we want to escape pixel data and anything
+            # that is dicom specific
+            if k == 'PixelData':
+                continue
+                
+            typeVal = str(type(de.value))
+            result[k] = str(de.value)
+            
+        return result
+            
+
+    except Exception as e:
+        logger.error(f'Unable to read metadata from the file {fileName}: {e}')
 
     return result
+
 

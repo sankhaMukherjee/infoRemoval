@@ -56,6 +56,10 @@ class MyGUI:
         self.redactButton = tk.Button(self.miscButtonsFrame, text = 'redactFiles', command=self.redactFiles)
         self.redactButton.pack( side = tk.LEFT)
 
+        self.loadAllButton = tk.Button(self.miscButtonsFrame, text = 'check DICOM File', command=self.checkDicomFeatures)
+        self.loadAllButton.pack( side = tk.RIGHT)
+        
+
         self.__activateLoad__()
         self.__activateRedaction__()
 
@@ -148,7 +152,7 @@ class MyGUI:
 
         return fileName
 
-    @lD.log( logBase + '.getFile' )
+    @lD.log( logBase + '.loadDicomFeatures' )
     def loadDicomFeatures(logger, self):
         '''[summary]
         
@@ -192,6 +196,48 @@ class MyGUI:
         except Exception as e:
             logger.error(f'Unable to load the DICOM file: {e}')
             self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to load the dicom file: {e}'
+
+    @lD.log( logBase + '.checkFile' )
+    def checkDicomFeatures(logger, self):
+        '''[summary]
+        
+        [description]
+        
+        Parameters
+        ----------
+        logger : {[type]}
+            [description]
+        self : {[type]}
+            [description]
+        '''
+
+
+        try:
+
+            fileName = self.fileName.get()
+            if not os.path.exists(fileName):
+                self.statusLabel['text'] = 'STATUS: [ERROR] - File not found ...'
+
+            metaData = dicomIO.readAllFileMetaData( fileName )
+            print(metaData)
+            if metaData == {}:
+                self.statusLabel['text'] = 'STATUS: [ERROR] - Probably not a good DICOM file ...'
+                return
+
+            self.statusLabel['text'] = f'STATUS: [OK] - DICOM file {fileName} loaded'
+
+            # Update the metadata and allow selection
+            self.metaData = metaData
+            self.__updateMetaData__( metaData )
+
+            self.allowSelection = False 
+            self.__activateLoad__()
+            
+
+        except Exception as e:
+            logger.error(f'Unable to load the DICOM file: {e}')
+            self.statusLabel['text'] = f'STATUS: [ERROR] - Unable to load the dicom file: {e}'
+
 
     @lD.log( logBase + '.__updateMetaData__' )
     def __updateMetaData__(logger, self, metaData):
